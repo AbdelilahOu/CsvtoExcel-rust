@@ -1,11 +1,9 @@
-use csv::StringRecord;
 use rust_xlsxwriter::{self, Workbook};
 use std::{env::args, fs::read_dir, path::Path};
 
 #[derive(Debug)]
 struct CsvFilesData {
     path: Box<Path>,
-    name: String,
     sheet_name: String,
 }
 
@@ -32,7 +30,6 @@ fn main() {
                                     file_name_with_ext.split(".").next().unwrap().to_string();
                                 files_data.push(CsvFilesData {
                                     path: file.path().as_path().into(),
-                                    name: file_name.clone(),
                                     sheet_name: to_pascale_case(file_name),
                                 })
                             }
