@@ -1,3 +1,4 @@
+use csv::StringRecord;
 use rust_xlsxwriter::{self, Workbook};
 use std::{env::args, fs::read_dir, path::Path};
 
@@ -81,7 +82,39 @@ fn print_table_to_excel(workbook: &mut Workbook, csc_file: CsvFilesData) {
     // create sheet
     let worksheet_result = workbook.add_worksheet().set_name(&csc_file.sheet_name);
     match worksheet_result {
-        Ok(worksheet) => {}
+        Ok(worksheet) => {
+            // read data from csv
+            let rdr = csv::ReaderBuilder::new().from_path(csc_file.path);
+            match rdr {
+                Ok(mut r) => {
+                    let headers = r.headers();
+                    match headers {
+                        Ok(h) => {
+                            let add_h_res = worksheet.write_row(0, 0, h.clone().iter());
+                            match add_h_res {
+                                Ok(_) => {}
+                                Err(e) => panic!("coudnt add headers{:?}", e),
+                            }
+                        }
+                        Err(e) => panic!("coudnt get headers{:?}", e),
+                    }
+                    for (i, record) in r.records().enumerate() {
+                        match record {
+                            Ok(r) => {
+                                worksheet.write_row(i as u32 + 1, 0, r.iter()).unwrap();
+                            }
+
+                            Err(e) => {
+                                panic!("{:?},{:?}", String::from("error in row"), e);
+                            }
+                        }
+                    }
+                }
+                Err(e) => {
+                    panic!("{:?}", e);
+                }
+            }
+        }
         Err(err) => {
             panic!("coudnt create sheet from name: {:?}", err)
         }
