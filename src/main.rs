@@ -8,12 +8,13 @@ struct CsvFilesData {
 }
 
 fn to_pascale_case(name: String) -> String {
+    // retrn if name is empty
     if name.is_empty() {
         return name;
     }
-
+    // create result
     let mut result = String::from("");
-
+    // check if it has _ and uppercase first chart
     if name.contains("_") {
         for subname in name.split("_") {
             result = result + &to_pascale_case(subname.to_string());
@@ -22,7 +23,7 @@ fn to_pascale_case(name: String) -> String {
         let first_chart = name.chars().nth(0).unwrap().to_uppercase().to_string();
         result = first_chart + &name[1..];
     }
-
+    //
     return result;
 }
 
