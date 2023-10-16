@@ -1,3 +1,4 @@
+use rust_xlsxwriter::{self, Workbook};
 use std::{env::args, fs::read_dir, path::Path};
 
 #[derive(Debug)]
@@ -5,26 +6,6 @@ struct CsvFilesData {
     path: Box<Path>,
     name: String,
     sheet_name: String,
-}
-
-fn to_pascale_case(name: String) -> String {
-    // retrn if name is empty
-    if name.is_empty() {
-        return name;
-    }
-    // create result
-    let mut result = String::from("");
-    // check if it has _ and uppercase first chart
-    if name.contains("_") {
-        for subname in name.split("_") {
-            result = result + &to_pascale_case(subname.to_string());
-        }
-    } else {
-        let first_chart = name.chars().nth(0).unwrap().to_uppercase().to_string();
-        result = first_chart + &name[1..];
-    }
-    //
-    return result;
 }
 
 fn main() {
@@ -63,8 +44,46 @@ fn main() {
                     Err(e) => panic!("{}", e),
                 }
             }
-            println!("{:?}", files_data)
+            // create new workbook
+            let mut workbook = Workbook::new();
+            // start printing
+            for file_data in files_data {
+                print_table_to_excel(&mut workbook, file_data)
+            }
+
+            workbook.save("output.xlsx").unwrap();
         }
         _ => panic!("Invalid number of arguments"),
+    }
+}
+
+fn to_pascale_case(name: String) -> String {
+    // retrn if name is empty
+    if name.is_empty() {
+        return name;
+    }
+    // create result
+    let mut result = String::from("");
+    // check if it has _ and uppercase first chart
+    if name.contains("_") {
+        for subname in name.split("_") {
+            result = result + &to_pascale_case(subname.to_string());
+        }
+    } else {
+        let first_chart = name.chars().nth(0).unwrap().to_uppercase().to_string();
+        result = first_chart + &name[1..];
+    }
+    //
+    return result;
+}
+
+fn print_table_to_excel(workbook: &mut Workbook, csc_file: CsvFilesData) {
+    // create sheet
+    let worksheet_result = workbook.add_worksheet().set_name(&csc_file.sheet_name);
+    match worksheet_result {
+        Ok(worksheet) => {}
+        Err(err) => {
+            panic!("coudnt create sheet from name: {:?}", err)
+        }
     }
 }
