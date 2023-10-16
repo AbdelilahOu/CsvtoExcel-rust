@@ -43,14 +43,13 @@ fn main() {
             for file in files {
                 match file {
                     Ok(file) => {
-                        let file_path = Path::new(data_folder).join(file.path());
                         let file_name_with_ext = file.file_name().into_string().ok();
                         match file_name_with_ext {
                             Some(file_name_with_ext) => {
                                 let file_name =
                                     file_name_with_ext.split(".").next().unwrap().to_string();
                                 files_data.push(CsvFilesData {
-                                    path: file_path.as_path().into(),
+                                    path: file.path().as_path().into(),
                                     name: file_name.clone(),
                                     sheet_name: to_pascale_case(file_name),
                                 })
