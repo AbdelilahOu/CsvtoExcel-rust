@@ -1,5 +1,12 @@
+use chrono::Datelike;
 use rust_xlsxwriter::{self, Workbook};
-use std::{collections::HashMap, env::args, fs::read_dir, path::Path, time};
+use std::{
+    collections::HashMap,
+    env::args,
+    fs::read_dir,
+    path::Path,
+    time::{self, UNIX_EPOCH},
+};
 
 #[derive(Debug)]
 struct CsvFilesData {
@@ -50,7 +57,18 @@ fn main() {
             for file_data in files_data {
                 print_table_to_excel(&mut workbook, file_data)
             }
-            workbook.save(format!("{}.xlsx", "output")).unwrap();
+            let current_time = chrono::Utc::now();
+            workbook
+                .save(format!(
+                    "{}-{}-{}-{:?}.xlsx",
+                    current_time.year(),
+                    current_time.month(),
+                    current_time.day(),
+                    time::SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .expect("Time went backwards")
+                ))
+                .unwrap();
         }
         _ => panic!("Invalid number of arguments"),
     }
