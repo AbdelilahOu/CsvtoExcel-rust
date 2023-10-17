@@ -1,5 +1,5 @@
 use rust_xlsxwriter::{self, Workbook};
-use std::{collections::HashMap, env::args, fs::read_dir, path::Path};
+use std::{collections::HashMap, env::args, fs::read_dir, path::Path, time};
 
 #[derive(Debug)]
 struct CsvFilesData {
@@ -8,6 +8,8 @@ struct CsvFilesData {
 }
 
 fn main() {
+    // start
+    let now = time::SystemTime::now();
     // get and check for args
     let args: Vec<String> = args().collect();
     // check for args
@@ -48,11 +50,11 @@ fn main() {
             for file_data in files_data {
                 print_table_to_excel(&mut workbook, file_data)
             }
-
-            workbook.save("output.xlsx").unwrap();
+            workbook.save(format!("{}.xlsx", "output")).unwrap();
         }
         _ => panic!("Invalid number of arguments"),
     }
+    println!("{:?}", now.elapsed().unwrap());
 }
 
 fn to_pascale_case(name: String) -> String {
